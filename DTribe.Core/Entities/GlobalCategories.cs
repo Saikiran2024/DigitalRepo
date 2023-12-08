@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DTribe.Core.Entities
+namespace DTribe.DB.Entities
 {
-    public class Categories
+    public class GlobalCategories
     {
         public Guid IDX { get; set; }
-        public string UserID { get; set; }
         [Key]
         public string CategoryID { get; set; }
         public string CategoryName { get; set; }

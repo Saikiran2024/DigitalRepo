@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DTribe.Core.DTO
 {
-    public class CategoriesDTO
+    public class GlobalCategoriesDTO
     {
-        public string UserID { get; set; }
         public string CategoryID { get; set; }
         public string CategoryName { get; set; }
     }
