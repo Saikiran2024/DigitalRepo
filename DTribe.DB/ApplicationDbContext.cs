@@ -39,15 +39,6 @@ namespace DTribe.DB
         public DbSet<UserInfo> TblUser { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //string userId = "superadmin";
-            //string password = "Digital@23";
-
-            //if (userId == null || password == null)
-            //{
-            //    throw new InvalidOperationException("User ID or Password environment variables not found");
-            //}
-
-            //string connectionString = $"Server=tcp:digitaltribedb.database.windows.net,1433;Initial Catalog=digitaltribe;Persist Security Info=False;User ID=superadmin;Password={password};";
 
             optionsBuilder.UseSqlServer(DtribeDBConnectionStringProvider.GetConnectionString());
         }

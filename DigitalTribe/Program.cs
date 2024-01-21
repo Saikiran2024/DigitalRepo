@@ -3,7 +3,6 @@ using DTribe.Core.Mappings;
 using DTribe.Core.Services;
 using DTribe.DB;
 using DTribe.DB.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 public class Program
@@ -54,8 +53,13 @@ public class Program
     }
     private static void ConfigureDatabase(WebApplicationBuilder builder)
     {
+    //    DtribeDBConnectionStringProvider.Initilize(builder.Configuration);
+    //    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+    //DtribeDBConnectionStringProvider.GetConnectionString(),
+    //sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)));
+
         DtribeDBConnectionStringProvider.Initilize(builder.Configuration);
-        builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(DtribeDBConnectionStringProvider.GetConnectionString()));
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(DtribeDBConnectionStringProvider.GetConnectionString()));
     }
 
     private static void ConfigureMiddileware(WebApplicationBuilder builder)
@@ -75,6 +79,8 @@ public class Program
 
     private static void RegisterScoppedServices(WebApplicationBuilder builder)
     {
+        //builder.Services.AddScoped<ITokenValidationService, DatabaseTokenValidationService>();
+
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         //builder.Services.AddDbContextFactory<ApplicationDbContext>();
@@ -87,6 +93,7 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        //app.UseMiddleware<TokenValidationMiddleware>();
         app.UseHttpsRedirection();
 
         app.UseAuthorization();

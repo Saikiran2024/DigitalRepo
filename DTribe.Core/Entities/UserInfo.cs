@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Types;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,7 +18,10 @@ namespace DTribe.Core.Entities
         public int Age { get; set; }
         public string Gender { get; set; }
         public string CategoryID { get; set; }
-        public string Location { get; set; }
+        public int LocationID { get; set; }
+        public float Latitude { get; set; }
+        public float Longitude { get; set; }
+        //public SqlGeography Coordinates { get; set; }
         public bool IsNotification { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
