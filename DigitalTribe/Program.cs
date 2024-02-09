@@ -35,19 +35,19 @@ public class Program
 
         var app = builder.Build();
 
-        ConfigureRequestPipelne(app);
+        //ConfigureRequestPipelne(app);
         // Configure the HTTP request pipeline.
-        //if (app.Environment.IsDevelopment())
-        //{
-        //    app.UseSwagger();
-        //    app.UseSwaggerUI();
-        //}
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
 
-        //app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
-        //app.UseAuthorization();
+        app.UseAuthorization();
 
-        //app.MapControllers();
+        app.MapControllers();
 
         app.Run();
     }
@@ -81,7 +81,13 @@ public class Program
     {
         //builder.Services.AddScoped<ITokenValidationService, DatabaseTokenValidationService>();
 
-        builder.Services.AddScoped<ICategoryService, CategoryService>();
+        builder.Services.AddScoped<IUserCategoryService, UserCategoryService>();
+        builder.Services.AddScoped<IUserCategoriesRepository, UserCategoriesRepository>();
+
+        builder.Services.AddScoped<ISectionRepository, SectionRepository>();
+        builder.Services.AddScoped<ISectionService, SectionService>();
+
+        builder.Services.AddScoped<ICategoriesService, CategoriesService>();
         builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         //builder.Services.AddDbContextFactory<ApplicationDbContext>();
     }

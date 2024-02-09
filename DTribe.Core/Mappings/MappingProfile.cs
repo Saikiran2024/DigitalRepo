@@ -9,11 +9,14 @@ namespace DTribe.Core.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<GlobalCategories,GlobalCategoriesDTO>();
-            CreateMap<GlobalCategoryItems, GlobalCategoryItemDTO>();
-            CreateMap<Categories, CategoriesDTO>();
-            CreateMap<CategoryItem, CategoryItemDTO>();
-            CreateMap<CategoryItemDTO, CategoryItem>();
+            CreateMap<UserCategoriesDTO, UserCategories>().ReverseMap();
+            CreateMap<Categories, CategoriesDTO>().ReverseMap();
+           
+
+            CreateMap<GlobalSectionCategoriesDTO, GlobalSectionCategories>().ReverseMap();
+            CreateMap<SectionDTO, Section>().ReverseMap();
+            CreateMap<UserCategoriesSearchBySPDTO, UserCategoriesSearchResult>().ReverseMap();
+            CreateMap<UserInfoDTO, UserInfo>().ReverseMap();
         }
     }
 }

@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace DTribe.Core.Entities
 {
-    public class GlobalCategoryItems
+    public class Section
     {
-        public Guid? IDX { get; set; }
-        public string CategoryID { get; set; }
-        public string CategoryName { get; set; }
+        public Guid IDX { get; set; }
         [Key]
-        public string CategoryItemID { get; set; }
-        public string CategoryItemName { get; set; }
+        public string SectionID { get; set; } 
+        public string SectionName { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
     }

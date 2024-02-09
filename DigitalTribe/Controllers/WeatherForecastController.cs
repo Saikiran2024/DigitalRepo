@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DigitalTribe.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Test")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

@@ -1,12 +1,17 @@
 ﻿using DTribe.Core.Entities;
 using DTribe.Core.IRepositories;
-using DTribe.DB.Entities;
-using EFCore.BulkExtensions;
+using DTribe.Core.Utilities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace DTribe.DB.Repositories
 {
-
     public class CategoriesRepository : ICategoriesRepository
     {
         private readonly ApplicationDbContext _context;
@@ -16,98 +21,80 @@ namespace DTribe.DB.Repositories
             _context = context;
         }
 
-
-        public async Task<List<GlobalCategories>> GetGlobalCategoriesListAsync()
+        public async Task<IEnumerable<UserCategoriesSearchResult>> GetCategoriesSearchBySPAsync(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID)
         {
-            List<GlobalCategories>? category = await _context.TblGlobalCategories.ToListAsync();
-            return category;
+            IEnumerable<UserCategoriesSearchResult> result = _context.SPGetCategoriesNearByLocation(searchString, UserID, userLatitude, userLongitude, distanceType, city, sectionID);
+            return result;
         }
 
-        public async Task<List<GlobalCategoryItems>> GetGlobalCategoriesItemsListAsync(string categoryId)
-        {
-            List<GlobalCategoryItems>? category = await _context.TblGlobalCategoryItems.Where(n=>n.CategoryID==categoryId).AsNoTracking().ToListAsync();
-            return category;
-        }
 
-        public async Task<List<Categories>> GetUserCategoriesListAsync(string UserID)
-        {
-            List<Categories>? category = await _context.TblCategories.Where(n => n.UserID == UserID).ToListAsync();
-            return category;
-        }
+        //public async Task<IEnumerable<UserCategories>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city)
+        //{
+        //    //Location referenceLocation = new Location { Latitude = 37.7749, Longitude = -122.4194 };
 
-        public async Task<List<CategoryItem>> GetUserCategoriesItemListAsync(string UserID,string categoryId)
-        {
-            List<CategoryItem>? category = await _context.TblCategoryItems.Where(n => n.UserID == UserID && n.CategoryID==categoryId).AsNoTracking().ToListAsync();
-            return category;
-        }
+        //    IQueryable<UserCategories> categories;
 
-        public async Task InsertCategory(string UserID, List<Categories> category)
-        {
-            await _context.BulkInsertAsync(category);
-        }
+        //    if (sectionID == null)
+        //    {
+        //        switch (distanceType)
+        //        {
+        //            case "Nearby":
+        //                categories = _context.TblUserCategories
+        //                .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+        //                        new Location { Latitude = userLocation.Lattitude, Longitude = userLocation.Longitude },
+        //                        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
+        //                .AsNoTracking();
+        //                break;
 
-        public async Task UpdateCategory(string UserID, List<Categories> category)
-        {
-            foreach (var updatedCategory in category)
-            {
-                // Load the existing category from the database
-                var existingCategory = await _context.TblCategories.FindAsync(updatedCategory.CategoryID);
+        //            case "Nationwide":
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
+        //                break;
+
+        //            case "Explore":
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
+        //                break;
+
+        //            // Add more cases as needed
+
+        //            default:
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID).AsNoTracking();
+        //                break;
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        switch (distanceType)
+        //        {
+        //            case "Nearby":
+        //                categories = _context.TblUserCategories
+        //                .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+        //                        new Location { Latitude = userLocation.Lattitude, Longitude = userLocation.Longitude },
+        //                        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && userLocation.SectionID == sectionID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
+        //                .AsNoTracking();
+
+        //                break;
+
+        //            case "Nationwide":
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.SectionID == sectionID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
+        //                break;
+
+        //            case "Explore":
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
+        //                break;
+
+        //            // Add more cases as needed
+
+        //            default:
+        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID).AsNoTracking();
+        //                break;
+        //        }
 
 
-                if (existingCategory != null)
-                {
-                    // Update only the desired columns
-                    existingCategory.CategoryID = updatedCategory.CategoryID;
-                    existingCategory.CategoryName = updatedCategory.CategoryName;
-                }
-            }
-            //await _context.BulkUpdateAsync(modifiedCategories);
-            await _context.SaveChangesAsync();
-            //await _context.BulkUpdateAsync(category, options => options.ColumnInputExpression = c => new { c.ColumnToIgnore });
-        }
-
-        public async Task DeleteCategory(string UserID, List<Categories> category)
-        {
-            await _context.BulkDeleteAsync(category);
-        }
-
-        public async Task InsertCategorItem(string UserID, List<CategoryItem> category)
-        {
-            await _context.BulkInsertAsync(category);
-        }
-
-        public async Task UpdateCategorItem(string UserID, List<CategoryItem> category)
-        {
-            foreach (var updatedCategory in category)
-            {
-                // Load the existing category from the database
-                var existingCategory = await _context.TblCategories.FindAsync(updatedCategory.CategoryID);
+        //    }
+        //    return await categories.ToListAsync();
+        //}
 
 
-                if (existingCategory != null)
-                {
-                    // Update only the desired columns
-                    existingCategory.CategoryID = updatedCategory.CategoryID;
-                    existingCategory.CategoryName = updatedCategory.CategoryName;
-                }
-            }
-            //await _context.BulkUpdateAsync(modifiedCategories);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteCategorItem(string UserID, List<CategoryItem> category)
-        {
-            foreach (var updatedCategory in category)
-            {
-                // Load the existing category from the database
-                var existingCategory = await _context.TblCategoryItems.Where(n => n.UserID == UserID && n.CategoryItemID == updatedCategory.CategoryItemID).SingleOrDefaultAsync();
-
-                if (existingCategory != null)
-                {
-                    _context.TblCategoryItems.Remove(existingCategory);
-                }
-            }
-            await _context.SaveChangesAsync();
-        }
     }
 }
