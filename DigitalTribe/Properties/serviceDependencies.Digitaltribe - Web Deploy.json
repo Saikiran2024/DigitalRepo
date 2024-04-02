@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "apis2": {
+      "apiEndpoint": "https://digitaltribeapi.azure-api.net/",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/DigitalTribeapi/apis/DigitalTribe",
+      "type": "apis.azure"
+    }
+  }
+}
