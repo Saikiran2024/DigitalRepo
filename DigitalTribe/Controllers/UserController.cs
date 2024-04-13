@@ -43,7 +43,7 @@ namespace DigitalTribe.Controllers
             var response = await _UserinfoService.Insert(userinfo);
             return ResponseHandler.Handle(response);
         }
-        [HttpPost("Update")]
+        [HttpDelete("Update")]
         public async Task<IActionResult> UpdateUserDetails(UserInfoDTO userinfo)
         {
             var response = await _UserinfoService.Update(userinfo);

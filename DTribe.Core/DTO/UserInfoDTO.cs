@@ -17,9 +17,9 @@ namespace DTribe.Core.DTO
         public DateTime? DOB { get; set; }
         public string? Gender { get; set; }
         public string? Language { get; set; }
-        public int? LocationID { get; set; }
-        public float? Latitude { get; set; }
-        public float? Longitude { get; set; }
+        public string? LocationID { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         //public SqlGeography Coordinates { get; set; }
         public bool? IsNotification { get; set; }
     }

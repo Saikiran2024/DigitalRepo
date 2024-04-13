@@ -59,10 +59,13 @@ namespace DTribe.Core.Services
                     FullName = userinfo.FullName,
                     UserName = userinfo.UserName,
                     DOB = userinfo.DOB,
+                    Age = userinfo.Age,
+                    LocationID = userinfo.LocationID,
                     Gender = userinfo.Gender,
                     Latitude = userinfo.Latitude,
                     Longitude = userinfo.Longitude,
                     Language = userinfo.Language,
+                    IsNotification = userinfo.IsNotification,
 
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
@@ -71,6 +74,7 @@ namespace DTribe.Core.Services
 
                 response.Status = ResponseStatus.Success;
                 response.Message = $"" + userinfo.UserName + " User Created successful.";
+                response.Data = usernew.UserID;
             }
             catch (Exception ex)
             {
@@ -87,9 +91,57 @@ namespace DTribe.Core.Services
             return response;
         }
 
-        public Task<StandardResponse<object>> Update(UserInfoDTO userinfo)
+        public async Task<StandardResponse<object>> Update(UserInfoDTO userinfo)
         {
-            throw new NotImplementedException();
+            var response = new StandardResponse<object>();
+            try
+            {
+                //TODO: validations here
+                var existingUser = await _userinfoRepository.GetUserInfoAsync(userinfo.UserID);
+
+                if (existingUser == null)
+                {
+                    // Handle the case where the entity to be updated is not found
+                    response.Status = ResponseStatus.Error;
+                    response.AddError("User not found.");
+                    return response;
+                }
+                //var usernew = new UserInfo
+                //{
+                existingUser.UserID = userinfo.UserID;
+                existingUser.MobileNumber = userinfo.MobileNumber;
+                existingUser.FullName = userinfo.FullName;
+                existingUser.UserName = userinfo.UserName;
+                existingUser.DOB = userinfo.DOB;
+                existingUser.Age = userinfo.Age;
+                existingUser.LocationID = userinfo.LocationID;
+                existingUser.Gender = userinfo.Gender;
+                existingUser.Latitude = userinfo.Latitude;
+                existingUser.Longitude = userinfo.Longitude;
+                existingUser.Language = userinfo.Language;
+                existingUser.IsNotification = userinfo.IsNotification;
+
+                existingUser.UpdatedDate = DateTime.Now;
+                //};
+                await _userinfoRepository.Update(existingUser);
+
+                response.Status = ResponseStatus.Success;
+                response.Message = $"" + userinfo.UserName + " User Created successful.";
+                response.Data = existingUser.UserID;
+            }
+            catch (Exception ex)
+            {
+                response.Status = ResponseStatus.Fatal;
+                response.AddError(FrequentErrors.InternalServerError);
+                response.AddError(ex.Message);
+                //response.AddError($"Error occurred while inserting data for Tenant: {tenantID}, User: {userID}");
+                response.AddError(userinfo.ToString());
+
+                //_logger.LogError(ex, "Error occurred while inserting data for Tenant: {TenantID}, User: {UserID}", tenantID, userID);
+                throw;
+            }
+
+            return response;
         }
         public async Task<StandardResponse<object>> Delete(string userID)
         {

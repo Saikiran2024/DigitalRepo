@@ -89,6 +89,9 @@ public class Program
 
         builder.Services.AddScoped<ICategoriesService, CategoriesService>();
         builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+
+        builder.Services.AddScoped<IUserInfoService, UserInfoServices>();
+        builder.Services.AddScoped<IUserInfoRepository, UserInfoRepository>();
         //builder.Services.AddDbContextFactory<ApplicationDbContext>();
     }
 
