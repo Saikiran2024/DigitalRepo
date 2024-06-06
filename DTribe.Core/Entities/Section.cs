@@ -13,6 +13,7 @@ namespace DTribe.Core.Entities
         [Key]
         public string SectionID { get; set; } 
         public string SectionName { get; set; }
+        public string Description { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
     }

@@ -100,7 +100,7 @@ namespace DTribe.Core.Services
                     CityLocationID = category.CityLocationID,
                     Description = category.Description,
                     DistanceLocation = category.DistanceLocation,
-                    Lattitude = category.Lattitude,
+                    Latitude = category.Latitude,
                     Longitude = category.Longitude,
                     Price = category.Price,
                     Rating = category.Rating,
@@ -155,7 +155,7 @@ namespace DTribe.Core.Services
                 existingCategory.CityLocationID = category.CityLocationID;
                 existingCategory.Description = category.Description;
                 existingCategory.DistanceLocation = category.DistanceLocation;
-                existingCategory.Lattitude = category.Lattitude;
+                existingCategory.Latitude = category.Latitude;
                 existingCategory.Longitude = category.Longitude;
                 existingCategory.Price = category.Price;
                 existingCategory.Rating = category.Rating;

@@ -16,4 +16,12 @@ namespace DTribe.Core.DTO
         public double userLongitude { get; set; }
         public string? city { get; set; }
     }
+    public class GetPostedDTO
+    {
+        public string? distanceType { get; set; }
+        public string? sectionID { get; set; }
+        public double userLatitude { get; set; }
+        public double userLongitude { get; set; }
+        public string? city { get; set; }
+    }
 }

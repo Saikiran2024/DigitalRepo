@@ -20,7 +20,7 @@ namespace DTribe.Core.DTO
         public int DistanceLocation { get; set; }
         public int? Rating { get; set; }
         public decimal? Price { get; set; }
-        public double Lattitude { get; set; }
+        public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string CityLocationID { get; set; }
     }

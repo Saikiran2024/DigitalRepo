@@ -19,9 +19,15 @@ namespace DigitalTribe.Controllers
         [HttpPost("Search")]  //if sectionID is get all categories
         public async Task<IActionResult> GetCategoriesSearchAsync(CategorySearchParamsDTO searchdetails)
         {
-            // The following method is responsible for initiating a call to another method located in the "BankAccountEvents" file.
             string UserID = "U1";
             var response = await _categoryService.GetCategoriesSearchBySPAsync(searchdetails.searchString, UserID, searchdetails.userLatitude, searchdetails.userLongitude, searchdetails.distanceType,searchdetails.city, searchdetails.sectionID);
+            return ResponseHandler.Handle(response);
+        }
+        [HttpPost("PostedList")]  //if sectionID is get all categories
+        public async Task<IActionResult> GetUserPostedList()
+        {
+            string UserID = "U2";
+            var response = await _categoryService.GetPostedList();
             return ResponseHandler.Handle(response);
         }
     }

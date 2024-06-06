@@ -15,15 +15,18 @@ namespace DTribe.Core.Services
 {
     public interface ICategoriesService
     {
+        Task<StandardResponse<IEnumerable<UserCategoriesSearchResult>>> GetPostedList();
         //Task<StandardResponse<IEnumerable<UserCategoriesDTO>>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city);
         Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetCategoriesSearchBySPAsync(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID);
     }
     public class CategoriesService : ICategoriesService
     {
         private static ICategoriesRepository _catRepository { get; set; }
+        private readonly IUserInfoRepository _userInfoRepository;
         private readonly IMapper _mapper;
-        public CategoriesService(ICategoriesRepository categoryRepository, IMapper mapper)
+        public CategoriesService(ICategoriesRepository categoryRepository,IUserInfoRepository userInfoRepository, IMapper mapper)
         {
+            _userInfoRepository = userInfoRepository;
             _catRepository = categoryRepository;
             _mapper = mapper;
         }
@@ -41,6 +44,23 @@ namespace DTribe.Core.Services
             }
             response.Status = ResponseStatus.Success;
             response.Data = categoriesdto;
+            return response;
+        }
+        public async Task<StandardResponse<IEnumerable<UserCategoriesSearchResult>>> GetPostedList()
+        {
+            var response = new StandardResponse<IEnumerable<UserCategoriesSearchResult>>();
+            UserInfo user = await _userInfoRepository.GetUserInfoAsync("U1");
+
+            IEnumerable<UserCategories>? category = await _catRepository.GetPostedList(null, "U1", "Nearby", user.Latitude, user.Longitude, null);
+
+            IEnumerable<UserCategoriesSearchResult>? categoriesdto = _mapper.Map<IEnumerable<UserCategoriesSearchResult>>(category);
+            if (category == null)
+            {
+                response.Status = ResponseStatus.Error;
+                response.AddError(FrequentErrors.UserNotFound, null);
+            }
+            response.Status = ResponseStatus.Success;
+            response.Data = categoriesdto.ToList();
             return response;
         }
     }

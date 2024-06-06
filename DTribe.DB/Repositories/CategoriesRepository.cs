@@ -28,72 +28,140 @@ namespace DTribe.DB.Repositories
         }
 
 
-        //public async Task<IEnumerable<UserCategories>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city)
-        //{
-        //    //Location referenceLocation = new Location { Latitude = 37.7749, Longitude = -122.4194 };
+        public async Task<IEnumerable<UserCategories>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city)
+        {
+            //Location referenceLocation = new Location { Latitude = 37.7749, Longitude = -122.4194 };
 
-        //    IQueryable<UserCategories> categories;
+            IQueryable<UserCategories> categories;
 
-        //    if (sectionID == null)
-        //    {
-        //        switch (distanceType)
-        //        {
-        //            case "Nearby":
-        //                categories = _context.TblUserCategories
-        //                .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
-        //                        new Location { Latitude = userLocation.Lattitude, Longitude = userLocation.Longitude },
-        //                        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
-        //                .AsNoTracking();
-        //                break;
+            if (sectionID == null)
+            {
+                switch (distanceType)
+                {
+                    case "Nearby":
+                        categories = _context.TblUserCategories
+                        .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+                                new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
+                                new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
+                        .AsNoTracking();
+                        break;
 
-        //            case "Nationwide":
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
-        //                break;
+                    case "Nationwide":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
+                        break;
 
-        //            case "Explore":
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
-        //                break;
+                    case "Explore":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
+                        break;
 
-        //            // Add more cases as needed
+                    // Add more cases as needed
 
-        //            default:
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID).AsNoTracking();
-        //                break;
-        //        }
+                    default:
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID).AsNoTracking();
+                        break;
+                }
 
-        //    }
-        //    else
-        //    {
-        //        switch (distanceType)
-        //        {
-        //            case "Nearby":
-        //                categories = _context.TblUserCategories
-        //                .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
-        //                        new Location { Latitude = userLocation.Lattitude, Longitude = userLocation.Longitude },
-        //                        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && userLocation.SectionID == sectionID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
-        //                .AsNoTracking();
+            }
+            else
+            {
+                switch (distanceType)
+                {
+                    case "Nearby":
+                        categories = _context.TblUserCategories
+                        .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+                                new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
+                                new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && userLocation.SectionID == sectionID && (userLocation.CategoryName.Contains(searchString) || userLocation.Title.Contains(searchString)))
+                        .AsNoTracking();
 
-        //                break;
+                        break;
 
-        //            case "Nationwide":
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.SectionID == sectionID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
-        //                break;
+                    case "Nationwide":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.SectionID == sectionID && n.Rating.HasValue && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).OrderByDescending(n => n.Rating).AsNoTracking();
+                        break;
 
-        //            case "Explore":
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
-        //                break;
+                    case "Explore":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID && n.CityLocationID == city && (n.CategoryName.Contains(searchString) || n.Title.Contains(searchString))).AsNoTracking();
+                        break;
 
-        //            // Add more cases as needed
+                    // Add more cases as needed
 
-        //            default:
-        //                categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID).AsNoTracking();
-        //                break;
-        //        }
+                    default:
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID).AsNoTracking();
+                        break;
+                }
 
 
-        //    }
-        //    return await categories.ToListAsync();
-        //}
+            }
+            return await categories.ToListAsync();
+        }
+
+        public async Task<IEnumerable<UserCategories>> GetPostedList(string sectionID, string UserID,  string distanceType, double userLatitude, double userLongitude, string city)
+        {
+            //Location referenceLocation = new Location { Latitude = 37.7749, Longitude = -122.4194 };
+
+            IQueryable<UserCategories> categories;
+
+            if (sectionID == null)
+            {
+                switch (distanceType)
+                {
+                    case "Nearby":
+                        //categories = _context.TblUserCategories
+                        //.Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+                        //        new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
+                        //        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID )
+                        //.AsNoTracking();
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue).OrderByDescending(n => n.Rating).AsNoTracking();
+                        break;
+
+                    case "Nationwide":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue ).OrderByDescending(n => n.Rating).AsNoTracking();
+                        break;
+
+                    case "Explore":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.CityLocationID == city).AsNoTracking();
+                        break;
+
+                    // Add more cases as needed
+
+                    default:
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID).AsNoTracking();
+                        break;
+                }
+
+            }
+            else
+            {
+                switch (distanceType)
+                {
+                    case "Nearby":
+                        categories = _context.TblUserCategories
+                        .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+                                new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
+                                new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID && userLocation.SectionID == sectionID )
+                        .AsNoTracking();
+
+                        break;
+
+                    case "Nationwide":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.SectionID == sectionID && n.Rating.HasValue ).OrderByDescending(n => n.Rating).AsNoTracking();
+                        break;
+
+                    case "Explore":
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID && n.CityLocationID == city ).AsNoTracking();
+                        break;
+
+                    // Add more cases as needed
+
+                    default:
+                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID || n.SectionID == sectionID).AsNoTracking();
+                        break;
+                }
+
+
+            }
+            return await categories.ToListAsync();
+        }
 
 
     }

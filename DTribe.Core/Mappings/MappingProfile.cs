@@ -17,6 +17,7 @@ namespace DTribe.Core.Mappings
             CreateMap<SectionDTO, Section>().ReverseMap();
             CreateMap<UserCategoriesSearchBySPDTO, UserCategoriesSearchResult>().ReverseMap();
             CreateMap<UserInfoDTO, UserInfo>().ReverseMap();
+            CreateMap<UserCategoriesSearchResult, UserCategories>().ReverseMap();
         }
     }
 }

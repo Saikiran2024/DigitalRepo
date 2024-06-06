@@ -18,9 +18,11 @@ namespace DTribe.Core.DTO
         public string? Gender { get; set; }
         public string? Language { get; set; }
         public string? LocationID { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+       
         //public SqlGeography Coordinates { get; set; }
         public bool? IsNotification { get; set; }
+        public string AccountStatus { get; set;}
     }
 }
