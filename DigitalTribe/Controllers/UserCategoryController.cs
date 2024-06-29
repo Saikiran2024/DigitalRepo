@@ -16,15 +16,6 @@ namespace DigitalTribe.Controllers
             _UsercategoryService = usercategoryService;
         }
 
-        [HttpGet("Details")]  //if sectionID is get all categories
-        public async Task<IActionResult> GetUser()
-        {
-            // The following method is responsible for initiating a call to another method located in the "BankAccountEvents" file.
-            string UserID = "U1";
-
-            var response = await _UsercategoryService.test();
-            return ResponseHandler.Handle(response);
-        }
 
         [HttpGet("List/{sectionID}")]  //if sectionID is get all categories
         public async Task<IActionResult> GetUserCategoryDetails(string sectionID)
@@ -39,11 +30,9 @@ namespace DigitalTribe.Controllers
         public async Task<IActionResult> GetCategoryDetailsByIDX(string Uscid)
         {
             // The following method is responsible for initiating a call to another method located in the "BankAccountEvents" file.
-            string UserID = "U1";
-            var response = await _UsercategoryService.GetCategoryDetailsByIDX(UserID, Uscid);
+            var response = await _UsercategoryService.GetCategoryDetailsByIDX(Uscid);
             return ResponseHandler.Handle(response);
         }
-
 
         [HttpGet("Search/{SerachString}/{sectionID}")]
         public async Task<IActionResult> GetCategoryDetailsByIDX(string SerachString,string sectionID)
@@ -53,8 +42,6 @@ namespace DigitalTribe.Controllers
             var response = await _UsercategoryService.CategoryWiseSearch(UserID, SerachString, sectionID);
             return ResponseHandler.Handle(response);
         }
-
-
 
         [HttpPost("Add")]
         public async Task<IActionResult> InsertCategoryDetails(UserCategoriesDTO details)
@@ -72,6 +59,7 @@ namespace DigitalTribe.Controllers
             return ResponseHandler.Handle(response);
 
         }
+
         [HttpDelete("Delete/{USCID}")]
         public async Task<IActionResult> DeleteCategoryDetails(string USCID)
         {

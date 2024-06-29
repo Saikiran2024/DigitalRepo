@@ -70,7 +70,7 @@ namespace DTribe.DB
             // modelBuilder.Entity<YourEntity>().HasKey(e => e.Id);
             //modelBuilder.Entity<Users>().HasIndex(d => d.UserID).IsUnique();
             modelBuilder.Entity<Categories>().HasKey(u => u.CategoryID);
-            modelBuilder.Entity<UserCategories>().HasKey(u => u.USCID);
+            modelBuilder.Entity<UserCategories>().HasKey(u => u.UserCategoryID);
             modelBuilder.Entity<UserInfo>().HasKey(u => u.UserID);
             modelBuilder.Entity<GlobalSectionCategories>().HasKey(u => u.SectionID);
             modelBuilder.Entity<Core.Entities.Section>().HasKey(u => u.SectionID);

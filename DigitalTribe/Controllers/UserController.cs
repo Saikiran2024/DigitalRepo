@@ -21,16 +21,12 @@ namespace DigitalTribe.Controllers
         [HttpGet("Profile")]
         public async Task<IActionResult> UserDetails()
         {
-            //foreach (var claim in User.Claims)
-            //{
-            //    Console.WriteLine($"{claim.Type}: {claim.Value}");
-            //}
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
             }
-            var response = await _UserinfoService.GetUserInfo(userId);
+            var response = await _UserinfoService.GetUserInfo();
             return ResponseHandler.Handle(response);
         }
 

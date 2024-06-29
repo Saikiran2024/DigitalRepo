@@ -3,19 +3,15 @@ using DTribe.Core.DTO;
 using DTribe.Core.Entities;
 using DTribe.Core.IRepositories;
 using DTribe.Core.ResponseObjects;
-using DTribe.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace DTribe.Core.Services
 {
     public interface IUserInfoService
     {
-        Task<StandardResponse<UserInfoDTO>> GetUserInfo(string UserID);
+        string GetUserId();
+        Task<StandardResponse<UserInfoDTO>> GetUserInfo();
         Task<StandardResponse<object>> Update(UserInfoDTO userinfo);
         Task<StandardResponse<object>> Delete(string userID);
     }
@@ -23,17 +19,25 @@ namespace DTribe.Core.Services
     {
         private static IUserInfoRepository _userinfoRepository { get; set; }
         private readonly IMapper _mapper;
-        public UserInfoServices(IUserInfoRepository userinfoRepository, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserInfoServices(IUserInfoRepository userinfoRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userinfoRepository = userinfoRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
-     
-        public async Task<StandardResponse<UserInfoDTO>> GetUserInfo(string UserID)
+
+        public string GetUserId()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            return userId.Value;
+        }
+        public async Task<StandardResponse<UserInfoDTO>> GetUserInfo()
         {
             var response = new StandardResponse<UserInfoDTO>();
+            string userId=GetUserId();
 
-            UserInfo? user = await _userinfoRepository.GetUserInfoAsync(UserID);
+            UserInfo? user = await _userinfoRepository.GetUserInfoAsync(userId);
             UserInfoDTO? userinfo = _mapper.Map<UserInfoDTO>(user);
 
             response.Status = ResponseStatus.Success;

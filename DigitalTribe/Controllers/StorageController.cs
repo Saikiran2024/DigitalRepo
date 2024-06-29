@@ -1,9 +1,4 @@
-﻿using DigitalTribe.Helpers;
-using DTribe.Core.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System.Net;
+﻿using Microsoft.AspNetCore.Mvc;
 //using static System.Net.WebRequestMethods;
 
 namespace DigitalTribe.Controllers
@@ -12,16 +7,7 @@ namespace DigitalTribe.Controllers
     [ApiController]
     public class StorageController : ControllerBase
     {
-        private readonly IWebHostEnvironment _hostingEnvironment;
-
-        //private readonly IStorageService _storageService;
-
-        //public StorageController(IStorageService storageService, IWebHostEnvironment hostingEnvironment)
-        //{
-        //    _storageService = storageService;
-        //    _hostingEnvironment = hostingEnvironment;
-        //}
-
+        //private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
 
         public StorageController(IConfiguration configuration)
@@ -69,7 +55,100 @@ namespace DigitalTribe.Controllers
 
         }
 
+        [HttpGet("list")]
+        public IActionResult GetImageList()
+        {
+            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"];
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                return NotFound("Upload folder not found.");
+            }
 
+            var imageFiles = Directory.GetFiles(uploadsFolderPath)
+                                      .Select(Path.GetFileName)
+                                      .ToList();
+
+            return Ok(imageFiles);
+        }
+
+        [HttpGet("GetFile/{ImageID}")]
+        public async Task<IActionResult> GetImagefromAPI(string ImageID)
+        {
+            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"]; //use this upload in server
+            var filePath = FindImagePathById(ImageID);
+            //var filePath = Path.Combine(uploadsFolderPath, ImageID);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            var mimeType = GetMimeType(filePath);
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return File(fileStream, mimeType);
+
+        }
+
+        [HttpDelete("Delete/{ImageID}")]
+        public IActionResult DeleteImage(string ImageID)
+        {
+            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"];
+            //var filePath = Path.Combine(uploadsFolderPath, ImageID);
+            var filePath = FindImagePathById(ImageID);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(new { Message = "Image not found." });
+            }
+
+            try
+            {
+                System.IO.File.Delete(filePath);
+                return Ok(new { Message = "Image deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not shown here for brevity)
+                return StatusCode(500, new { Message = "An error occurred while deleting the image.", Details = ex.Message });
+            }
+        }
+        private string GetMimeType(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            return extension switch
+            {
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".tiff" => "image/tiff",
+                _ => "application/octet-stream",
+            };
+        }
+
+        private string FindImagePathById(string imageId)
+        {
+            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"];
+            var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+
+            foreach (var ext in allowedExtensions)
+            {
+                var filePath = Path.Combine(uploadsFolderPath, $"{imageId}{ext}");
+                if (System.IO.File.Exists(filePath))
+                {
+                    return filePath;
+                }
+            }
+
+            return null;
+        }
+
+
+
+        #region UnusedCode
+
+        
 
         //    double fileLength = Convert.ToDouble(Request.Content.Headers.ContentLength);
 
@@ -167,6 +246,26 @@ namespace DigitalTribe.Controllers
         /// </summary>
 
 
+        //var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"]; //use this upload in server
+
+        //var filePath = Path.Combine(uploadsFolderPath, ImageID);
+
+        //if (!System.IO.File.Exists(filePath))
+        //{
+        //    return NotFound();
+        //}
+
+        //var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        //return File(fileStream, "application/octet-stream", ImageID);
+
+        //private readonly IStorageService _storageService;
+
+        //public StorageController(IStorageService storageService, IWebHostEnvironment hostingEnvironment)
+        //{
+        //    _storageService = storageService;
+        //    _hostingEnvironment = hostingEnvironment;
+        //}
+
 
         private const string BucketName = "your-bucket-name";
         //private readonly IAmazonS3 _s3Client;
@@ -176,23 +275,7 @@ namespace DigitalTribe.Controllers
         //    _s3Client = s3Client;
         //}
 
-        [HttpGet("GetFile/{ImageID}")]
-        public async Task<IActionResult> GetImagefromAPI(string ImageID)
-        {
-            //var uploadsFolderPath = Path.Combine(_hostingEnvironment.ContentRootPath, "uploads");
-            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"]; //use this upload in server
-
-            var filePath = Path.Combine(uploadsFolderPath, ImageID);
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound();
-            }
-
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return File(fileStream, "application/octet-stream", ImageID);
-        }
-
+        #endregion
     }
 
 }

@@ -8,7 +8,7 @@ namespace DTribe.Core.DTO
 {
     public class UserCategoriesDTO
     {
-        public string USCID { get; set; }
+        public string UserCategoryID { get; set; }
         public string UserID { get; set; }
         public string UserName { get; set; }
         public string SectionID { get; set; }

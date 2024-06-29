@@ -1,6 +1,7 @@
 using DTribe.Core.IRepositories;
 using DTribe.Core.Mappings;
 using DTribe.Core.Services;
+using DTribe.Core.Services.Auth;
 using DTribe.DB;
 using DTribe.DB.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -94,9 +95,10 @@ public class Program
     private static void RegisterScoppedServices(WebApplicationBuilder builder)
     {
         //builder.Services.AddScoped<ITokenValidationService, DatabaseTokenValidationService>();
-       
-        
 
+
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IStorageService,StorageService>();
         builder.Services.AddScoped<IUserCategoryService, UserCategoryService>();
         builder.Services.AddScoped<IUserCategoriesRepository, UserCategoriesRepository>();

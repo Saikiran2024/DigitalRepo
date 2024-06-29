@@ -49,7 +49,7 @@ namespace DTribe.DB.Repositories
         }
         public async Task<UserCategories> GetCategoryDetailsByIDX(string UserID, string Uscid)
         {
-            UserCategories? category = await _context.TblUserCategories.Where(n => n.USCID == Uscid && n.UserID == UserID).SingleOrDefaultAsync();
+            UserCategories? category = await _context.TblUserCategories.Where(n => n.UserCategoryID == Uscid && n.UserID == UserID).SingleOrDefaultAsync();
             return category;
         }
         public async Task Insert(string UserID, UserCategories usercategory)

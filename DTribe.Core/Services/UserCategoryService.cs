@@ -9,9 +9,7 @@ namespace DTribe.Core.Services
 {
     public interface IUserCategoryService
     {
-        Task<StandardResponse<UserCategoriesDTO>> GetCategoryDetailsByIDX(string UserID, string Uscid);
-        Task<StandardResponse<string>> test();
-
+        Task<StandardResponse<UserCategoriesDTO>> GetCategoryDetailsByIDX(string Uscid);
         Task<StandardResponse<List<UserCategoriesDTO>>> GetUserCategoriesListAsync(string UserID, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> CategoryWiseSearch(string UserID, string searchString, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> NearLocationWiseSearch(string UserID, string location);
@@ -23,17 +21,20 @@ namespace DTribe.Core.Services
     {
         private static IUserCategoriesRepository _categoryRepository { get; set; }
         private readonly IMapper _mapper;
-        public UserCategoryService(IUserCategoriesRepository categoryRepository, IMapper mapper)
+        private readonly IUserInfoService _userInfoService;
+        public UserCategoryService(IUserCategoriesRepository categoryRepository, IMapper mapper,IUserInfoService userInfoService)
         {
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _userInfoService.GetUserId();
         }
 
-        public async Task<StandardResponse<UserCategoriesDTO>> GetCategoryDetailsByIDX(string UserID, string Uscid)
+        public async Task<StandardResponse<UserCategoriesDTO>> GetCategoryDetailsByIDX(string Uscid)
         {
             var response = new StandardResponse<UserCategoriesDTO>();
+            string userId = _userInfoService.GetUserId();
 
-            UserCategories? category = await _categoryRepository.GetCategoryDetailsByIDX(UserID, Uscid);
+            UserCategories? category = await _categoryRepository.GetCategoryDetailsByIDX(userId, Uscid);
             UserCategoriesDTO? categoriesdto = _mapper.Map<UserCategoriesDTO>(category);
             if (category == null)
             {
@@ -91,7 +92,7 @@ namespace DTribe.Core.Services
                 var categoryNew = new UserCategories
                 {
                     //IDX = Guid.NewGuid(),
-                    USCID= userID+ category.SectionID+ category.CategoryID+ uscidSting,
+                    UserCategoryID= userID+ category.SectionID+ category.CategoryID+ uscidSting,
                     CategoryID = category.CategoryID,
                     CategoryName = category.CategoryName,
                     UserID = userID,
@@ -137,7 +138,7 @@ namespace DTribe.Core.Services
                 // TODO: Perform any necessary validations here
 
                 // Retrieve the existing entity from the repository
-                var existingCategory = await _categoryRepository.GetCategoryDetailsByIDX(userID, category.USCID);
+                var existingCategory = await _categoryRepository.GetCategoryDetailsByIDX(userID, category.UserCategoryID);
 
                 if (existingCategory == null)
                 {
@@ -219,13 +220,7 @@ namespace DTribe.Core.Services
             return response;
         }
 
-        public async Task<StandardResponse<string>> test()
-        {
-            var response = new StandardResponse<string>();
-            response.Status = ResponseStatus.Success;
-            response.Data= "test result";
-            return response;
-        }
+       
 
         /// <summary>
         /// //////////////
