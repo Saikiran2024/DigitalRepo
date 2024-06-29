@@ -28,5 +28,6 @@ namespace DTribe.Core.Entities
         public string AccountStatus { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public int? OTP {  get; set; }
     }
 }

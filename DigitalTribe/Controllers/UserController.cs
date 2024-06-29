@@ -1,12 +1,13 @@
 ﻿using DigitalTribe.Helpers;
 using DTribe.Core.DTO;
 using DTribe.Core.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 
 namespace DigitalTribe.Controllers
 {
+    [Authorize]
     [Route("api/User")]
     [ApiController]
     public class UserController : ControllerBase
@@ -15,40 +16,21 @@ namespace DigitalTribe.Controllers
         public UserController(IUserInfoService userinfoService)
         {
             _UserinfoService = userinfoService;
-        }
+        }     
 
-        [Route("Profile/{userID}"), HttpGet]
-        public async Task<IActionResult> UserDetails(string userID)
+        [HttpGet("Profile")]
+        public async Task<IActionResult> UserDetails()
         {
-            var response = await _UserinfoService.GetUserInfo(userID);
-            return ResponseHandler.Handle(response);
-        }
-
-        [Route("CheckOTP/{mobileNumber}/{otp}"), HttpGet]
-        public async Task<IActionResult> CheckOTP(string mobileNumber,string otp)
-        {
-            var response = await _UserinfoService.CheckOTPAndCreateAccount(mobileNumber,otp);
-            return ResponseHandler.Handle(response);
-        }
-
-        [Route("SendOTP/{mobileNumber}/{otp}"), HttpGet]
-        public async Task<IActionResult> SendOTP(string mobileNumber)
-        {
-            var response = await _UserinfoService.SendOTPToMobileNumber(mobileNumber);
-            return ResponseHandler.Handle(response);
-        }
-
-        [HttpPost("LoginCheckMobileNumber/{mobileNumber}")]
-        public async Task<IActionResult> Login(string mobileNumber)
-        {
-            var response = await _UserinfoService.SendOTPToMobileNumber(mobileNumber);
-            return ResponseHandler.Handle(response);
-        }
-
-        [HttpPost("LoginUser/{mobileNumber}/{otp}")]
-        public async Task<IActionResult> LoginUser(string mobileNumber,string otp)
-        {
-            var response = await _UserinfoService.LoginUser(mobileNumber,otp);
+            //foreach (var claim in User.Claims)
+            //{
+            //    Console.WriteLine($"{claim.Type}: {claim.Value}");
+            //}
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            var response = await _UserinfoService.GetUserInfo(userId);
             return ResponseHandler.Handle(response);
         }
 
@@ -58,11 +40,14 @@ namespace DigitalTribe.Controllers
             var response = await _UserinfoService.Update(userinfo);
             return ResponseHandler.Handle(response);
         }
+
         [HttpDelete("Delete")]
-        public async Task<IActionResult> DeleteDetails(string userID)
+        public async Task<IActionResult> Delete(string userID)
         {
             var response = await _UserinfoService.Delete(userID);
             return ResponseHandler.Handle(response);
         }
+
+        
     }
 }

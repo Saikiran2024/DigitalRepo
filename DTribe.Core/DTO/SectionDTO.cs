@@ -11,6 +11,6 @@ namespace DTribe.Core.DTO
     {
         public string SectionID { get; set; }
         public string SectionName { get; set; }
-
+        public string Description { get; set; }
     }
 }

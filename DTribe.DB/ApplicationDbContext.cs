@@ -40,7 +40,8 @@ namespace DTribe.DB
         public DbSet<GlobalSectionCategories> TblGlobalCategories { get; set; }
         public DbSet<Categories> TblCategories { get; set; }
         public DbSet<UserInfo> TblUser { get; set; }
-       
+        public DbSet<UserTemp> TblUserTemp { get; set; }
+
 
         public IEnumerable<UserCategoriesSearchResult> SPGetCategoriesNearByLocation(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID)
         {
@@ -74,6 +75,7 @@ namespace DTribe.DB
             modelBuilder.Entity<GlobalSectionCategories>().HasKey(u => u.SectionID);
             modelBuilder.Entity<Core.Entities.Section>().HasKey(u => u.SectionID);
             modelBuilder.Entity<UserCategoriesSearchResult>().HasKey(u => u.USCID);
+            modelBuilder.Entity<UserTemp>().HasKey(u => u.MobileNumber);
         }
         public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
         {

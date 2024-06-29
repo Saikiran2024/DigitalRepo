@@ -106,12 +106,12 @@ namespace DTribe.DB.Repositories
                 switch (distanceType)
                 {
                     case "Nearby":
-                        //categories = _context.TblUserCategories
-                        //.Where(userLocation => GeoCalculator.CalculateHaversineDistance(
-                        //        new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
-                        //        new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID )
-                        //.AsNoTracking();
-                        categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue).OrderByDescending(n => n.Rating).AsNoTracking();
+                        categories = _context.TblUserCategories
+                        .Where(userLocation => GeoCalculator.CalculateHaversineDistance(
+                                new Location { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude },
+                                new Location { Latitude = userLatitude, Longitude = userLongitude }) > 10.0 && userLocation.UserID != UserID)
+                        .AsNoTracking();
+                        //categories = _context.TblUserCategories.Where(n => n.UserID != UserID && n.Rating.HasValue).OrderByDescending(n => n.Rating).AsNoTracking();
                         break;
 
                     case "Nationwide":

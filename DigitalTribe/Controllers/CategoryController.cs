@@ -23,7 +23,7 @@ namespace DigitalTribe.Controllers
             var response = await _categoryService.GetCategoriesSearchBySPAsync(searchdetails.searchString, UserID, searchdetails.userLatitude, searchdetails.userLongitude, searchdetails.distanceType,searchdetails.city, searchdetails.sectionID);
             return ResponseHandler.Handle(response);
         }
-        [HttpPost("PostedList")]  //if sectionID is get all categories
+        [HttpGet("PostedList")]  //if sectionID is get all categories
         public async Task<IActionResult> GetUserPostedList()
         {
             string UserID = "U2";

@@ -3,7 +3,10 @@ using DTribe.Core.Mappings;
 using DTribe.Core.Services;
 using DTribe.DB;
 using DTribe.DB.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 public class Program
 {
@@ -18,6 +21,9 @@ public class Program
         ConfigureDatabase(builder);
 
         ConfigureSwagger(builder);
+
+        RegisterJwtAuthentication(builder); // Register JWT Authentication
+
         // Add services to the container.
 
 
@@ -35,6 +41,8 @@ public class Program
 
         var app = builder.Build();
 
+        ConfigureRequestPipelne(app);
+
         //ConfigureRequestPipelne(app);
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -44,12 +52,18 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseStaticFiles(); // This enables serving static files from wwwroot
 
         app.UseAuthorization();
-
+        app.UseAuthentication(); // Add authentication middleware
         app.MapControllers();
 
         app.Run();
+
+
+        //app.UseMiddleware<TokenValidationMiddleware>();
+
+       
     }
     private static void ConfigureDatabase(WebApplicationBuilder builder)
     {
@@ -66,7 +80,7 @@ public class Program
     {
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddAuthentication();
+        //builder.Services.AddAuthentication();
         builder.Services.AddMemoryCache();
     }
 
@@ -80,7 +94,10 @@ public class Program
     private static void RegisterScoppedServices(WebApplicationBuilder builder)
     {
         //builder.Services.AddScoped<ITokenValidationService, DatabaseTokenValidationService>();
+       
+        
 
+        builder.Services.AddScoped<IStorageService,StorageService>();
         builder.Services.AddScoped<IUserCategoryService, UserCategoryService>();
         builder.Services.AddScoped<IUserCategoriesRepository, UserCategoriesRepository>();
 
@@ -104,8 +121,10 @@ public class Program
         }
         //app.UseMiddleware<TokenValidationMiddleware>();
         app.UseHttpsRedirection();
-
+        app.UseStaticFiles();
+        app.UseAuthentication(); // Add authentication middleware
         app.UseAuthorization();
+       
 
         app.MapControllers();
     }
@@ -113,5 +132,32 @@ public class Program
     private static void RegisteredSingletoneServices(WebApplicationBuilder builder)
     {
         builder.Services.AddAutoMapper(typeof(MappingProfile));
+        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+
+    }
+    private static void RegisterJwtAuthentication(WebApplicationBuilder builder)
+    {
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]); // Ensure this is a strong key and secure it
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+        });
     }
 }
