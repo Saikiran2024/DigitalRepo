@@ -15,6 +15,23 @@ namespace DigitalTribe.Controllers
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
+        [HttpGet("list")]
+        public IActionResult GetImageList()
+        {
+            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"];
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                return NotFound("Upload folder not found.");
+            }
+
+            var imageFiles = Directory.GetFiles(uploadsFolderPath)
+                                      .Select(Path.GetFileName)
+                                      .ToList();
+
+            return Ok(imageFiles);
+        }
+
+        // The image ID should be provided since we do not know which image is being uploaded or from where.
         [HttpPost("Upload/{ImageID}")]
         public async Task<IActionResult> uploadImages(string ImageID, IFormFile file)
         {
@@ -43,6 +60,7 @@ namespace DigitalTribe.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
+                var fileUrls = $"{_configuration["FileUploadSettings:BaseUrl"]}/{ImageID}{fileExtension}";
 
                 var fileUrl = Path.Combine($"{ImageID}{fileExtension}").Replace("\\", "/");
 
@@ -53,22 +71,6 @@ namespace DigitalTribe.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
             }
 
-        }
-
-        [HttpGet("list")]
-        public IActionResult GetImageList()
-        {
-            var uploadsFolderPath = _configuration["FileUploadSettings:ServerPath"];
-            if (!Directory.Exists(uploadsFolderPath))
-            {
-                return NotFound("Upload folder not found.");
-            }
-
-            var imageFiles = Directory.GetFiles(uploadsFolderPath)
-                                      .Select(Path.GetFileName)
-                                      .ToList();
-
-            return Ok(imageFiles);
         }
 
         [HttpGet("GetFile/{ImageID}")]
@@ -89,6 +91,7 @@ namespace DigitalTribe.Controllers
 
         }
 
+        //TODO: if delete here delete in db ids also
         [HttpDelete("Delete/{ImageID}")]
         public IActionResult DeleteImage(string ImageID)
         {
@@ -112,6 +115,7 @@ namespace DigitalTribe.Controllers
                 return StatusCode(500, new { Message = "An error occurred while deleting the image.", Details = ex.Message });
             }
         }
+
         private string GetMimeType(string filePath)
         {
             var extension = Path.GetExtension(filePath).ToLowerInvariant();

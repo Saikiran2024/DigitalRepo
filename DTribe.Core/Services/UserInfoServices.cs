@@ -3,6 +3,7 @@ using DTribe.Core.DTO;
 using DTribe.Core.Entities;
 using DTribe.Core.IRepositories;
 using DTribe.Core.ResponseObjects;
+using DTribe.Core.Utilities;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
@@ -13,6 +14,7 @@ namespace DTribe.Core.Services
         string GetUserId();
         Task<StandardResponse<UserInfoDTO>> GetUserInfo();
         Task<StandardResponse<object>> Update(UserInfoDTO userinfo);
+        Task<StandardResponse<object>> AddUserImage();
         Task<StandardResponse<object>> Delete(string userID);
     }
     public class UserInfoServices : IUserInfoService
@@ -93,6 +95,48 @@ namespace DTribe.Core.Services
 
                 //_logger.LogError(ex, "Error occurred while inserting data for Tenant: {TenantID}, User: {UserID}", tenantID, userID);
                 throw;
+            }
+
+            return response;
+        }
+
+        public async Task<StandardResponse<object>> AddUserImage()
+        {
+            var response = new StandardResponse<object>();
+            string userID = GetUserId();
+            try
+            {
+                var existingUser = await _userinfoRepository.GetUserInfoAsync(userID);
+
+                if (existingUser == null)
+                {
+                    response.Status = ResponseStatus.Error;
+                    response.AddError("User not found.");
+                    return response;
+                }
+
+                //if(existingUser.UserImageID != null)
+                //{
+                //    response.Status = ResponseStatus.Error;
+                //    response.AddError("UserImageID alredy Exists take from user details.");
+                //    return response;
+                //}
+
+                existingUser.UserImageID = userID + RandomStringGenerator.GenerateRandomString(4);
+                existingUser.UpdatedDate = DateTime.Now;
+
+                await _userinfoRepository.UserImageUpdate(existingUser);
+
+                response.Status = ResponseStatus.Success;
+                response.Message = $"User ImageID created successful.";
+                response.Data = existingUser.UserImageID;
+            }
+            catch (Exception ex)
+            {
+                response.Status = ResponseStatus.Fatal;
+                response.AddError(FrequentErrors.InternalServerError);
+                response.AddError(ex.Message);
+                return response;
             }
 
             return response;

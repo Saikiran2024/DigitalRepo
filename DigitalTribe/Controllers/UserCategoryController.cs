@@ -46,8 +46,7 @@ namespace DigitalTribe.Controllers
         [HttpPost("Add")]
         public async Task<IActionResult> InsertCategoryDetails(UserCategoriesDTO details)
         {
-            string userID = "U1";
-            var response = await _UsercategoryService.Insert(userID, details);
+            var response = await _UsercategoryService.Insert(details);
             return ResponseHandler.Handle(response);
         }
 
@@ -55,7 +54,7 @@ namespace DigitalTribe.Controllers
         public async Task<IActionResult> UpdateCategoryDetails(UserCategoriesDTO details)
         {
             string userID = "U1";
-            var response = await _UsercategoryService.Update(userID, details);
+            var response = await _UsercategoryService.Update(details);
             return ResponseHandler.Handle(response);
 
         }
@@ -64,7 +63,7 @@ namespace DigitalTribe.Controllers
         public async Task<IActionResult> DeleteCategoryDetails(string USCID)
         {
             string userID = "U1";
-            var response = await _UsercategoryService.Delete(userID, USCID);
+            var response = await _UsercategoryService.Delete(USCID);
             return ResponseHandler.Handle(response);
         }
 

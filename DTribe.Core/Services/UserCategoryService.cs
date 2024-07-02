@@ -13,16 +13,16 @@ namespace DTribe.Core.Services
         Task<StandardResponse<List<UserCategoriesDTO>>> GetUserCategoriesListAsync(string UserID, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> CategoryWiseSearch(string UserID, string searchString, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> NearLocationWiseSearch(string UserID, string location);
-        Task<StandardResponse<object>> Insert(string userID, UserCategoriesDTO category);
-        Task<StandardResponse<object>> Update(string userID, UserCategoriesDTO category);
-        Task<StandardResponse<object>> Delete(string userID, string USCID);
+        Task<StandardResponse<object>> Insert(UserCategoriesDTO category);
+        Task<StandardResponse<object>> Update(UserCategoriesDTO category);
+        Task<StandardResponse<object>> Delete(string USCID);
     }
     public class UserCategoryService : IUserCategoryService
     {
         private static IUserCategoriesRepository _categoryRepository { get; set; }
         private readonly IMapper _mapper;
         private readonly IUserInfoService _userInfoService;
-        public UserCategoryService(IUserCategoriesRepository categoryRepository, IMapper mapper,IUserInfoService userInfoService)
+        public UserCategoryService(IUserCategoriesRepository categoryRepository, IMapper mapper, IUserInfoService userInfoService)
         {
             _categoryRepository = categoryRepository;
             _mapper = mapper;
@@ -82,20 +82,21 @@ namespace DTribe.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<StandardResponse<object>> Insert(string userID, UserCategoriesDTO category)
+        public async Task<StandardResponse<object>> Insert(UserCategoriesDTO category)
         {
             var response = new StandardResponse<object>();
             try
             {
-                string uscidSting= RandomStringGenerator.GenerateRandomString(5);
+                string userId = _userInfoService.GetUserId();
+                string uscidSting = RandomStringGenerator.GenerateRandomString(5);
                 //TODO: validations here
                 var categoryNew = new UserCategories
                 {
                     //IDX = Guid.NewGuid(),
-                    UserCategoryID= userID+ category.SectionID+ category.CategoryID+ uscidSting,
+                    UserCategoryID = userId + category.SectionID + category.CategoryID + uscidSting,
                     CategoryID = category.CategoryID,
                     CategoryName = category.CategoryName,
-                    UserID = userID,
+                    UserID = userId,
                     Title = category.Title,
                     SectionID = category.SectionID,
                     CityLocationID = category.CityLocationID,
@@ -105,14 +106,14 @@ namespace DTribe.Core.Services
                     Longitude = category.Longitude,
                     Price = category.Price,
                     Rating = category.Rating,
-                    ImageID = category.ImageID,
+                    ImageID = userId + category.SectionID + category.CategoryID + RandomStringGenerator.GenerateRandomString(10),
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
                 };
-                await _categoryRepository.Insert(userID, categoryNew);
+                await _categoryRepository.Insert(userId, categoryNew);
 
                 response.Status = ResponseStatus.Success;
-                response.Message = $""+category.CategoryName+" Category Insert successful.";
+                response.Message = $" { category.CategoryName},{ category.ImageID}  Category Insert successful.";
             }
             catch (Exception ex)
             {
@@ -129,12 +130,13 @@ namespace DTribe.Core.Services
             return response;
         }
 
-        public async Task<StandardResponse<object>> Update(string userID, UserCategoriesDTO category)
+        public async Task<StandardResponse<object>> Update(UserCategoriesDTO category)
         {
             var response = new StandardResponse<object>();
 
             try
             {
+                string userID = _userInfoService.GetUserId();
                 // TODO: Perform any necessary validations here
 
                 // Retrieve the existing entity from the repository
@@ -167,7 +169,7 @@ namespace DTribe.Core.Services
                 await _categoryRepository.Update(userID, existingCategory);
 
                 response.Status = ResponseStatus.Success;
-                response.Message = ""+category.CategoryName+" Category Update successful.";
+                response.Message = "" + category.CategoryName + " Category Update successful.";
             }
             catch (Exception ex)
             {
@@ -183,14 +185,15 @@ namespace DTribe.Core.Services
             return response;
         }
 
-        public async Task<StandardResponse<object>> Delete(string userID, string USCID)
+        public async Task<StandardResponse<object>> Delete(string USCID)
         {
             var response = new StandardResponse<object>();
 
             try
             {
+                string userID = _userInfoService.GetUserId();
                 // Retrieve the existing entity from the repository
-                
+
                 var existingCategory = await _categoryRepository.GetCategoryDetailsByIDX(userID, USCID);
 
                 if (existingCategory == null)
@@ -220,7 +223,7 @@ namespace DTribe.Core.Services
             return response;
         }
 
-       
+
 
         /// <summary>
         /// //////////////

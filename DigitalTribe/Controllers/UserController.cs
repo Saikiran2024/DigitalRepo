@@ -21,12 +21,14 @@ namespace DigitalTribe.Controllers
         [HttpGet("Profile")]
         public async Task<IActionResult> UserDetails()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
             var response = await _UserinfoService.GetUserInfo();
+            return ResponseHandler.Handle(response);
+        }
+
+        [HttpGet("AddImage")]
+        public async Task<IActionResult> AddImage()
+        {
+            var response = await _UserinfoService.AddUserImage();
             return ResponseHandler.Handle(response);
         }
 

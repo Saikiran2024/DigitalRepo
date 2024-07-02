@@ -15,6 +15,7 @@ namespace DTribe.Core.IRepositories
         Task InsertUserTempSignUp(UserTemp userinfo);
         Task Insert(UserInfo userinfo);
         Task Update(UserInfo userinfo);
+        Task UserImageUpdate(UserInfo userinfo);
         Task Delete(UserInfo userID);
         Task DeleteTempUser(UserTemp usertemp);
         Task UpdateOTP(string mobilenumber, int newOTP);

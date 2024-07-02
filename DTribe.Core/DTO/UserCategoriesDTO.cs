@@ -23,5 +23,6 @@ namespace DTribe.Core.DTO
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string CityLocationID { get; set; }
+        public bool IsSystemImage { get; set; }
     }
 }

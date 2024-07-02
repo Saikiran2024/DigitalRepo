@@ -29,5 +29,6 @@ namespace DTribe.Core.Entities
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public int? OTP {  get; set; }
+        public string? UserImageID { get; set; }
     }
 }

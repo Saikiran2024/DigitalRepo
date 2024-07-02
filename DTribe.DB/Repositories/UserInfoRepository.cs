@@ -43,6 +43,19 @@ namespace DTribe.DB.Repositories
             _context.TblUser.Update(userinfo);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UserImageUpdate(UserInfo userinfo)
+        {
+            // Attach the user entity to the context
+            _context.TblUser.Attach(userinfo);
+
+            // Mark the Image property as modified
+            _context.Entry(userinfo).Property(u => u.UserImageID).IsModified = true;
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+        }
         public async Task UpdateOTP(string mobilenumber, int newOTP)
         {
             var user = await _context.TblUser.FirstOrDefaultAsync(u => u.MobileNumber == mobilenumber);

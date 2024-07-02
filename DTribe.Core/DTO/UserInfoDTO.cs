@@ -25,4 +25,5 @@ namespace DTribe.Core.DTO
         public bool? IsNotification { get; set; }
         public string AccountStatus { get; set;}
     }
+
 }

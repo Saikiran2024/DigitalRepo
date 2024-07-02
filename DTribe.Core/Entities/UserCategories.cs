@@ -25,6 +25,8 @@ namespace DTribe.Core.Entities
         public string CityLocationID { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }     
+        public string ImageUrl { get; set; }
+        public bool IsSystemImage { get; set; }
 
     }
 }
