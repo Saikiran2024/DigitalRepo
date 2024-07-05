@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTribe.DB.Entities
 {
-    public class GlobalSectionCategories
+    [Table("TblGlobalCategories")]
+    public class GlobalCategories
     {
         public Guid IDX { get; set; }   
         public string SectionID { get; set; }

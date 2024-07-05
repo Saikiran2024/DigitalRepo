@@ -69,7 +69,7 @@ namespace DTribe.Core.Services
                 existingUser.UserName = userinfo.UserName;
                 existingUser.DOB = userinfo.DOB;
                 existingUser.Age = userinfo.Age;
-                existingUser.LocationID = userinfo.LocationID;
+                existingUser.CityLocationID = userinfo.CityLocationID;
                 existingUser.Gender = userinfo.Gender;
                 existingUser.Latitude = userinfo.Latitude;
                 existingUser.Longitude = userinfo.Longitude;

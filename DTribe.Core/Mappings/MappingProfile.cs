@@ -13,11 +13,14 @@ namespace DTribe.Core.Mappings
             CreateMap<Categories, CategoriesDTO>().ReverseMap();
            
 
-            CreateMap<GlobalSectionCategoriesDTO, GlobalSectionCategories>().ReverseMap();
+            CreateMap<GlobalSectionCategoriesDTO, GlobalCategories>().ReverseMap();
+            CreateMap<GlobalCategoriesDTO, GlobalCategories>().ReverseMap();
             CreateMap<SectionDTO, Section>().ReverseMap();
-            CreateMap<UserCategoriesSearchBySPDTO, UserCategoriesSearchResult>().ReverseMap();
+            //CreateMap<UserCategoriesSearchBySPDTO, UserCategoriesSearchResult>().ReverseMap();
             CreateMap<UserInfoDTO, UserInfo>().ReverseMap();
             CreateMap<UserCategoriesSearchResult, UserCategories>().ReverseMap();
+            CreateMap<UserCategoriesSearchResult, UserCategoriesSearchBySPDTO>()
+            .ForMember(dest => dest.PostedTime, opt => opt.MapFrom<PostedTimeResolver>());
         }
     }
 }

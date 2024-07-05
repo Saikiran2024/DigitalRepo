@@ -12,6 +12,6 @@ namespace DTribe.Core.IRepositories
     {
         Task<List<Section>> GetSectionList();
 
-        Task<List<GlobalSectionCategories>> GetSectionCategoryList(string SectionID);
+        Task<List<GlobalCategories>> GetSectionCategoryList(string SectionID);
     }
 }

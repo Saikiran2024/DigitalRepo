@@ -42,7 +42,7 @@ namespace DTribe.Core.Services
         {
             var response = new StandardResponse<List<GlobalSectionCategoriesDTO>>();
 
-            List<GlobalSectionCategories>? section = await _sectionRepository.GetSectionCategoryList(SectionID);
+            List<GlobalCategories>? section = await _sectionRepository.GetSectionCategoryList(SectionID);
             List<GlobalSectionCategoriesDTO>? sections = _mapper.Map<List<GlobalSectionCategoriesDTO>>(section);
 
             response.Status = ResponseStatus.Success;

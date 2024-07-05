@@ -7,7 +7,7 @@ namespace DTribe.Core.Entities
     public class UserCategories
     {
         
-        //public Guid IDX { get; set; }
+        public Guid IDX { get; set; }
         [Key]
         public string UserCategoryID { get; set; }
         public string UserID { get; set; }
@@ -17,7 +17,7 @@ namespace DTribe.Core.Entities
         public string? ImageID { get; set; }
         public string Title { get; set; }
         public string? Description { get; set; }
-        public int? DistanceLocation { get; set; }
+        //public int? DistanceLocation { get; set; }
         public int? Rating { get; set; }
         public decimal? Price { get; set; }
         public double Latitude {  get; set; }

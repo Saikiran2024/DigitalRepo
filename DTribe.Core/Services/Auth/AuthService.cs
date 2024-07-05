@@ -106,11 +106,12 @@ namespace DTribe.Core.Services.Auth
         {
             var response = new StandardResponse<object>();
             UserInfo? user = await _userinfoRepository.GetUserInfoByMobileNumberAsync(mobileNumber);
-            if (user != null)
+            if (user == null)
             {
                 response.Status = ResponseStatus.Error;
                 response.Message = "User not Available pls SignUp";
                 response.Data = mobileNumber;
+                return response;
             }
             //TODO: Send OTP to mobileNumber here
 

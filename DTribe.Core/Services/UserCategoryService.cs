@@ -13,20 +13,24 @@ namespace DTribe.Core.Services
         Task<StandardResponse<List<UserCategoriesDTO>>> GetUserCategoriesListAsync(string UserID, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> CategoryWiseSearch(string UserID, string searchString, string sectionID);
         Task<StandardResponse<List<UserCategoriesDTO>>> NearLocationWiseSearch(string UserID, string location);
-        Task<StandardResponse<object>> Insert(UserCategoriesDTO category);
-        Task<StandardResponse<object>> Update(UserCategoriesDTO category);
+        Task<StandardResponse<object>> Insert(UserCategoriesAddDTO category);
+        Task<StandardResponse<object>> Update(UserCategoriesUpdateDTO category);
         Task<StandardResponse<object>> Delete(string USCID);
     }
     public class UserCategoryService : IUserCategoryService
     {
         private static IUserCategoriesRepository _categoryRepository { get; set; }
+        private readonly ICategoriesService _categoriesService;
         private readonly IMapper _mapper;
         private readonly IUserInfoService _userInfoService;
-        public UserCategoryService(IUserCategoriesRepository categoryRepository, IMapper mapper, IUserInfoService userInfoService)
+        private readonly IUserInfoRepository _userinfoRepository;
+        public UserCategoryService(IUserCategoriesRepository categoryRepository,ICategoriesService categoriesService,IUserInfoRepository userInfoRepository, IMapper mapper, IUserInfoService userInfoService)
         {
             _categoryRepository = categoryRepository;
+            _categoriesService = categoriesService;
+            _userInfoService = userInfoService;
             _mapper = mapper;
-            _userInfoService.GetUserId();
+            _userinfoRepository = userInfoRepository;
         }
 
         public async Task<StandardResponse<UserCategoriesDTO>> GetCategoryDetailsByIDX(string Uscid)
@@ -82,38 +86,47 @@ namespace DTribe.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<StandardResponse<object>> Insert(UserCategoriesDTO category)
+        public async Task<StandardResponse<object>> Insert(UserCategoriesAddDTO category)
         {
             var response = new StandardResponse<object>();
+            var responsecategory = new StandardResponse<GlobalCategoriesDTO>();
             try
             {
                 string userId = _userInfoService.GetUserId();
+                UserInfo? userinfo = await _userinfoRepository.GetUserInfoAsync(userId);
+                responsecategory = await _categoriesService.GetUserCategoriesAsync(category.CategoryID);
                 string uscidSting = RandomStringGenerator.GenerateRandomString(5);
+
                 //TODO: validations here
                 var categoryNew = new UserCategories
                 {
-                    //IDX = Guid.NewGuid(),
-                    UserCategoryID = userId + category.SectionID + category.CategoryID + uscidSting,
+                    IDX = Guid.NewGuid(),
+                    UserCategoryID = userinfo.UserID + responsecategory.Data.SectionID + category.CategoryID + uscidSting,
                     CategoryID = category.CategoryID,
-                    CategoryName = category.CategoryName,
-                    UserID = userId,
+                    CategoryName = responsecategory.Data.CategoryName,
+                    UserID = userinfo.UserID,
                     Title = category.Title,
-                    SectionID = category.SectionID,
-                    CityLocationID = category.CityLocationID,
+                    SectionID = responsecategory.Data.SectionID,
+                    CityLocationID = userinfo.CityLocationID,
                     Description = category.Description,
-                    DistanceLocation = category.DistanceLocation,
-                    Latitude = category.Latitude,
-                    Longitude = category.Longitude,
+                    //DistanceLocation = category.DistanceLocation,
+                    Latitude = userinfo.Latitude,
+                    Longitude = userinfo.Longitude,
                     Price = category.Price,
-                    Rating = category.Rating,
-                    ImageID = userId + category.SectionID + category.CategoryID + RandomStringGenerator.GenerateRandomString(10),
+                    //Rating = category.Rating,
+                    ImageID = userinfo.UserID + responsecategory.Data.SectionID + category.CategoryID + RandomStringGenerator.GenerateRandomString(10),
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
                 };
                 await _categoryRepository.Insert(userId, categoryNew);
-
+                var responseData = new
+                {
+                    CategoryID = categoryNew.CategoryID,
+                    ImageID = categoryNew.ImageID
+                };
                 response.Status = ResponseStatus.Success;
-                response.Message = $" { category.CategoryName},{ category.ImageID}  Category Insert successful.";
+                response.Data= responseData;
+                response.Message = $" Category Insert successful.";
             }
             catch (Exception ex)
             {
@@ -130,13 +143,16 @@ namespace DTribe.Core.Services
             return response;
         }
 
-        public async Task<StandardResponse<object>> Update(UserCategoriesDTO category)
+        public async Task<StandardResponse<object>> Update(UserCategoriesUpdateDTO category)
         {
             var response = new StandardResponse<object>();
+            var responsecategory = new StandardResponse<GlobalCategoriesDTO>();
 
             try
             {
                 string userID = _userInfoService.GetUserId();
+                UserInfo? userinfo = await _userinfoRepository.GetUserInfoAsync(userID);
+                responsecategory = await _categoriesService.GetUserCategoriesAsync(category.CategoryID);
                 // TODO: Perform any necessary validations here
 
                 // Retrieve the existing entity from the repository
@@ -152,24 +168,20 @@ namespace DTribe.Core.Services
 
                 // Update the properties of the existing entity
                 existingCategory.CategoryID = category.CategoryID;
-                existingCategory.CategoryName = category.CategoryName;
+                existingCategory.CategoryName = responsecategory.Data.CategoryName;
                 existingCategory.Title = category.Title;
-                existingCategory.SectionID = category.SectionID;
-                existingCategory.CityLocationID = category.CityLocationID;
+                existingCategory.SectionID = responsecategory.Data.SectionID;
+                //existingCategory.CityLocationID = responsecategory.Data.CityLocationID;
                 existingCategory.Description = category.Description;
-                existingCategory.DistanceLocation = category.DistanceLocation;
-                existingCategory.Latitude = category.Latitude;
-                existingCategory.Longitude = category.Longitude;
+                //existingCategory.DistanceLocation = category.DistanceLocation;
                 existingCategory.Price = category.Price;
-                existingCategory.Rating = category.Rating;
-                existingCategory.ImageID = category.ImageID;
                 existingCategory.UpdatedDate = DateTime.Now;
 
                 // Save the changes to the repository
                 await _categoryRepository.Update(userID, existingCategory);
 
                 response.Status = ResponseStatus.Success;
-                response.Message = "" + category.CategoryName + " Category Update successful.";
+                response.Message = "" + responsecategory.Data.CategoryName + " Category Update successful.";
             }
             catch (Exception ex)
             {

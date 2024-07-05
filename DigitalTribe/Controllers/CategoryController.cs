@@ -1,11 +1,13 @@
 ﻿using DigitalTribe.Helpers;
 using DTribe.Core.DTO;
 using DTribe.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalTribe.Controllers
 {
+    [Authorize]
     [Route("api/Category")]
     [ApiController]
     public class CategoryController : ControllerBase
@@ -16,19 +18,18 @@ namespace DigitalTribe.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpPost("Search")]  //if sectionID is get all categories
-        public async Task<IActionResult> GetCategoriesSearchAsync(CategorySearchParamsDTO searchdetails)
+        [HttpPost("UserPostedList")] 
+        public async Task<IActionResult> UserPostedList(CategorySearchParamsDTO searchdetails)
         {
-            string UserID = "U1";
-            var response = await _categoryService.GetCategoriesSearchBySPAsync(searchdetails.searchString, UserID, searchdetails.userLatitude, searchdetails.userLongitude, searchdetails.distanceType,searchdetails.city, searchdetails.sectionID);
+            var response = await _categoryService.GetPostedListBySearch(searchdetails.searchString,searchdetails.distanceType, searchdetails.sectionID);
             return ResponseHandler.Handle(response);
         }
-        [HttpGet("PostedList")]  //if sectionID is get all categories
-        public async Task<IActionResult> GetUserPostedList()
-        {
-            string UserID = "U2";
-            var response = await _categoryService.GetPostedList();
-            return ResponseHandler.Handle(response);
-        }
+
+        //[HttpGet("UserPostedList")] 
+        //public async Task<IActionResult> GetPostedList()
+        //{
+        //    var response = await _categoryService.GetPostedList();
+        //    return ResponseHandler.Handle(response);
+        //}
     }
 }

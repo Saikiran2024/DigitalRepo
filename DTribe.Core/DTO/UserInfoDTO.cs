@@ -17,7 +17,7 @@ namespace DTribe.Core.DTO
         public DateTime? DOB { get; set; }
         public string? Gender { get; set; }
         public string? Language { get; set; }
-        public string? LocationID { get; set; }
+        public string? CityLocationID { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
        

@@ -37,24 +37,34 @@ namespace DTribe.DB
 
         public DbSet<Core.Entities.Section> TblSection { get; set; }
         public DbSet<UserCategories> TblUserCategories { get; set; }
-        public DbSet<GlobalSectionCategories> TblGlobalCategories { get; set; }
+        public DbSet<GlobalCategories> TblGlobalCategories { get; set; }
         public DbSet<Categories> TblCategories { get; set; }
         public DbSet<UserInfo> TblUser { get; set; }
         public DbSet<UserTemp> TblUserTemp { get; set; }
 
 
-        public IEnumerable<UserCategoriesSearchResult> SPGetCategoriesNearByLocation(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID)
+        public IEnumerable<UserCategoriesSearchResult> SPGetNearestLocationBySearch(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID)
         {
             var parameters = new[] {
-                    new SqlParameter("@SearchString", searchString),
+                    new SqlParameter("@SearchString", searchString?? (object)DBNull.Value),
+                    new SqlParameter("@UserID", UserID ?? (object)DBNull.Value),
+                    new SqlParameter("@UserLatitude", userLatitude ),
+                    new SqlParameter("@UserLongitude", userLongitude),
+                    new SqlParameter("@DistanceType", distanceType ??(object) DBNull.Value),
+                    new SqlParameter("@City", city ?? (object)DBNull.Value),
+                    new SqlParameter("@SectionID", sectionID ??(object) DBNull.Value)
+            };
+            return Set<UserCategoriesSearchResult>().FromSqlRaw("EXEC SPGetNearestLocationBySearch @SearchString,@UserID,@UserLatitude,@UserLongitude,@DistanceType,@City,@SectionID", parameters).ToList();
+        }
+
+        public IEnumerable<UserCategoriesSearchResult> SPGetNearestLocation(string UserID, double userLatitude, double userLongitude)
+        {
+            var parameters = new[] {
                     new SqlParameter("@UserID", UserID),
                     new SqlParameter("@UserLatitude", userLatitude),
-                    new SqlParameter("@UserLongitude", userLongitude),
-                    new SqlParameter("@DistanceType", distanceType),
-                    new SqlParameter("@City", city),
-                    new SqlParameter("@SectionID", sectionID)
+                    new SqlParameter("@UserLongitude", userLongitude)
             };
-            return Set<UserCategoriesSearchResult>().FromSqlRaw("EXEC SPGetCategoriesNearByLocation @SearchString,@UserID,@UserLatitude,@UserLongitude,@DistanceType,@City,@SectionID", parameters).ToList();
+            return Set<UserCategoriesSearchResult>().FromSqlRaw("EXEC SPGetNearestLocation @UserID,@UserLatitude,@UserLongitude", parameters).ToList();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -72,9 +82,9 @@ namespace DTribe.DB
             modelBuilder.Entity<Categories>().HasKey(u => u.CategoryID);
             modelBuilder.Entity<UserCategories>().HasKey(u => u.UserCategoryID);
             modelBuilder.Entity<UserInfo>().HasKey(u => u.UserID);
-            modelBuilder.Entity<GlobalSectionCategories>().HasKey(u => u.SectionID);
+            modelBuilder.Entity<GlobalCategories>().HasKey(u => u.SectionID);
             modelBuilder.Entity<Core.Entities.Section>().HasKey(u => u.SectionID);
-            modelBuilder.Entity<UserCategoriesSearchResult>().HasKey(u => u.USCID);
+            modelBuilder.Entity<UserCategoriesSearchResult>().HasKey(u => u.UserCategoryID);
             modelBuilder.Entity<UserTemp>().HasKey(u => u.MobileNumber);
         }
         public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>

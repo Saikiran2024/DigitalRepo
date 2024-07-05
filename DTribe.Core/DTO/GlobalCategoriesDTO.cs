@@ -8,6 +8,7 @@ namespace DTribe.Core.DTO
 {
     public class GlobalCategoriesDTO
     {
+        public string SectionID { get; set; }
         public string CategoryID { get; set; }
         public string CategoryName { get; set; }
     }

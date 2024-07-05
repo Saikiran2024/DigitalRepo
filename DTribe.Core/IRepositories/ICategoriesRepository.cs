@@ -1,10 +1,5 @@
 ﻿using DTribe.Core.Entities;
-using DTribe.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DTribe.DB.Entities;
 
 namespace DTribe.Core.IRepositories
 {
@@ -12,7 +7,9 @@ namespace DTribe.Core.IRepositories
     {
         //Task<IEnumerable<UserCategories>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city);
 
-        Task<IEnumerable<UserCategories>> GetPostedList(string sectionID, string UserID, string distanceType, double userLatitude, double userLongitude, string city);
-        Task<IEnumerable<UserCategoriesSearchResult>> GetCategoriesSearchBySPAsync(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID);
+        Task<GlobalCategories> GetUserCategoriesAsync(string categoryID);
+        Task<IEnumerable<UserCategoriesSearchResult>> GetPostedListBySearch(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID);
+
+        Task<IEnumerable<UserCategoriesSearchResult>> GetPostedList(string UserID, double userLatitude, double userLongitude);
     }
 }

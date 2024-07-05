@@ -1,11 +1,13 @@
 ﻿using DigitalTribe.Helpers;
 using DTribe.Core.DTO;
 using DTribe.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalTribe.Controllers
 {
+    [Authorize]
     [Route("api/UserCategory")]
     [ApiController]
     public class UserCategoryController : ControllerBase
@@ -44,16 +46,15 @@ namespace DigitalTribe.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task<IActionResult> InsertCategoryDetails(UserCategoriesDTO details)
+        public async Task<IActionResult> InsertCategoryDetails(UserCategoriesAddDTO details)
         {
             var response = await _UsercategoryService.Insert(details);
             return ResponseHandler.Handle(response);
         }
 
         [HttpPost("Update")]
-        public async Task<IActionResult> UpdateCategoryDetails(UserCategoriesDTO details)
+        public async Task<IActionResult> UpdateCategoryDetails(UserCategoriesUpdateDTO details)
         {
-            string userID = "U1";
             var response = await _UsercategoryService.Update(details);
             return ResponseHandler.Handle(response);
 

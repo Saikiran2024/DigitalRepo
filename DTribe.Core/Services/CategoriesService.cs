@@ -3,38 +3,38 @@ using DTribe.Core.DTO;
 using DTribe.Core.Entities;
 using DTribe.Core.IRepositories;
 using DTribe.Core.ResponseObjects;
-using DTribe.Core.Utilities;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DTribe.DB.Entities;
 
 namespace DTribe.Core.Services
 {
     public interface ICategoriesService
     {
-        Task<StandardResponse<IEnumerable<UserCategoriesSearchResult>>> GetPostedList();
+        //Task<StandardResponse<IEnumerable<UserCategoriesSearchResult>>> GetPostedList();
         //Task<StandardResponse<IEnumerable<UserCategoriesDTO>>> GetCategoriesSearchAsync(string searchString, string UserID, int distance, string distanceType, string sectionID, double userLatitude, double userLongitude, string city);
-        Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetCategoriesSearchBySPAsync(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID);
+        Task<StandardResponse<GlobalCategoriesDTO>> GetUserCategoriesAsync(string categoryID);
+        Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetPostedList();
+        Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetPostedListBySearch(string searchString, string distanceType, string sectionID);
     }
     public class CategoriesService : ICategoriesService
     {
         private static ICategoriesRepository _catRepository { get; set; }
+        private static IUserInfoService _userinfoService { get; set; }
         private readonly IUserInfoRepository _userInfoRepository;
         private readonly IMapper _mapper;
-        public CategoriesService(ICategoriesRepository categoryRepository,IUserInfoRepository userInfoRepository, IMapper mapper)
+        public CategoriesService(ICategoriesRepository categoryRepository,IUserInfoService userInfoService,IUserInfoRepository userInfoRepository, IMapper mapper)
         {
             _userInfoRepository = userInfoRepository;
+            _userinfoService= userInfoService;
             _catRepository = categoryRepository;
             _mapper = mapper;
         }
-        public async Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetCategoriesSearchBySPAsync(string searchString, string UserID, double userLatitude, double userLongitude, string distanceType, string city, string sectionID)
+
+        public async Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetPostedListBySearch(string searchString, string distanceType, string sectionID)
         {
             var response = new StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>();
-
-            IEnumerable<UserCategoriesSearchResult>? category = await _catRepository.GetCategoriesSearchBySPAsync(searchString, UserID, userLatitude, userLongitude, distanceType, city, sectionID);
+            string userId= _userinfoService.GetUserId();
+            UserInfo user = await _userInfoRepository.GetUserInfoAsync(userId);
+            IEnumerable<UserCategoriesSearchResult>? category = await _catRepository.GetPostedListBySearch(searchString, userId, user.Latitude, user.Longitude, distanceType, user.CityLocationID, sectionID);
             
             IEnumerable<UserCategoriesSearchBySPDTO> ? categoriesdto = _mapper.Map<IEnumerable<UserCategoriesSearchBySPDTO>>(category);
             if (category == null)
@@ -46,22 +46,56 @@ namespace DTribe.Core.Services
             response.Data = categoriesdto;
             return response;
         }
-        public async Task<StandardResponse<IEnumerable<UserCategoriesSearchResult>>> GetPostedList()
+        public async Task<StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>> GetPostedList()
         {
-            var response = new StandardResponse<IEnumerable<UserCategoriesSearchResult>>();
-            UserInfo user = await _userInfoRepository.GetUserInfoAsync("U1");
+            var response = new StandardResponse<IEnumerable<UserCategoriesSearchBySPDTO>>();
+            string userId = _userinfoService.GetUserId();
+            UserInfo user = await _userInfoRepository.GetUserInfoAsync(userId);
+            IEnumerable<UserCategoriesSearchResult>? category = await _catRepository.GetPostedList(userId, user.Latitude, user.Longitude);
 
-            IEnumerable<UserCategories>? category = await _catRepository.GetPostedList(null, "U1", "Nearby", user.Latitude, user.Longitude, null);
-
-            IEnumerable<UserCategoriesSearchResult>? categoriesdto = _mapper.Map<IEnumerable<UserCategoriesSearchResult>>(category);
+            IEnumerable<UserCategoriesSearchBySPDTO>? categoriesdto = _mapper.Map<IEnumerable<UserCategoriesSearchBySPDTO>>(category);
             if (category == null)
             {
                 response.Status = ResponseStatus.Error;
                 response.AddError(FrequentErrors.UserNotFound, null);
             }
             response.Status = ResponseStatus.Success;
-            response.Data = categoriesdto.ToList();
+            response.Data = categoriesdto;
             return response;
         }
+
+        public async Task<StandardResponse<GlobalCategoriesDTO>> GetUserCategoriesAsync(string categoryID)
+        {
+            var response = new StandardResponse<GlobalCategoriesDTO>();
+
+            GlobalCategories? category = await _catRepository.GetUserCategoriesAsync(categoryID);
+            GlobalCategoriesDTO? categoriesdto = _mapper.Map<GlobalCategoriesDTO>(category);
+            if (category == null)
+            {
+                response.Status = ResponseStatus.Error;
+                response.AddError(FrequentErrors.UserNotFound, null);
+            }
+            response.Status = ResponseStatus.Success;
+            response.Data = categoriesdto;
+            return response;
+        }
+
+        //private string CalculatePostedTime(DateTime createdDate)
+        //{
+        //    TimeSpan timeSpan = DateTime.UtcNow - createdDate;
+
+        //    if (timeSpan.TotalHours >= 24)
+        //    {
+        //        return createdDate.ToString("yyyy-MM-dd");
+        //    }
+        //    else
+        //    {
+        //        int hours = (int)timeSpan.TotalHours;
+        //        int minutes = timeSpan.Minutes;
+        //        return $"{hours}h {minutes}m ago";
+        //    }
+        //}
     }
+
+
 }

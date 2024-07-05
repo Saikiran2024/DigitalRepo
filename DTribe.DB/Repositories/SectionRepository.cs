@@ -20,9 +20,9 @@ namespace DTribe.DB.Repositories
         }
 
 
-        public async Task<List<GlobalSectionCategories>> GetSectionCategoryList(string SectionID)
+        public async Task<List<GlobalCategories>> GetSectionCategoryList(string SectionID)
         {
-            List<GlobalSectionCategories>? sections = await _context.TblGlobalCategories.Where(n=>n.SectionID==SectionID).ToListAsync();
+            List<GlobalCategories>? sections = await _context.TblGlobalCategories.Where(n=>n.SectionID==SectionID).ToListAsync();
             return sections;
         }
 
